@@ -24,20 +24,82 @@ approval boundary.
 
 The production adapter runs inside AKS using Workload Identity:
 
-1. Create an Azure AI Foundry project/model deployment and record its
+1. Log in to Azure and select the subscription:
+
+```powershell
+az login
+az account set --subscription "<SUBSCRIPTION_ID_OR_NAME>"
+```
+
+2. Create an Azure AI Foundry project/model deployment and record its
    OpenAI-compatible endpoint and deployment name.
-2. Create a user-assigned managed identity and grant it the Foundry project
+3. Create a user-assigned managed identity and grant it the Foundry project
    inference role.
-3. Configure an AKS workload identity federated credential for the
+4. Configure an AKS workload identity federated credential for the
    `agentic-ops` service account.
-4. Build and push the image, then substitute the `${...}` values in
+5. Build and push the image, then substitute the `${...}` values in
    [deploy/aks-agentic-ops.yaml](./deploy/aks-agentic-ops.yaml) and apply it.
 
-```text
-docker build -t "$AGENTIC_OPS_IMAGE" .
-docker push "$AGENTIC_OPS_IMAGE"
-kubectl create namespace agentic-ops
-envsubst < deploy/aks-agentic-ops.yaml | kubectl apply -f -
+Set the deployment values in PowerShell:
+
+```powershell
+$resourceGroup = "rg-agentic-ops"
+$aksName = "aks-agentic-ops"
+$acrName = "<YOUR_ACR_NAME>"
+$env:AZURE_CLIENT_ID = "<USER_ASSIGNED_MANAGED_IDENTITY_CLIENT_ID>"
+$env:AZURE_AI_FOUNDRY_ENDPOINT = "https://<FOUNDRY_RESOURCE>.openai.azure.com"
+$env:AZURE_AI_FOUNDRY_DEPLOYMENT = "<FOUNDRY_MODEL_DEPLOYMENT_NAME>"
+$env:AGENTIC_OPS_IMAGE = "$acrName.azurecr.io/agentic-ops:0.1.0"
+```
+
+The recommended build path does not require Docker installed locally. Azure
+Container Registry builds the image remotely from this repository directory:
+
+```powershell
+az acr build `
+  --registry $acrName `
+  --image agentic-ops:0.1.0 `
+  .
+```
+
+Alternatively, if Docker is installed locally:
+
+```powershell
+az acr login --name $acrName
+docker build -t $env:AGENTIC_OPS_IMAGE .
+docker push $env:AGENTIC_OPS_IMAGE
+```
+
+Deploy the image to AKS:
+
+```powershell
+az aks get-credentials `
+  --resource-group $resourceGroup `
+  --name $aksName `
+  --overwrite-existing
+
+kubectl create namespace agentic-ops --dry-run=client -o yaml |
+  kubectl apply -f -
+
+(Get-Content .\deploy\aks-agentic-ops.yaml -Raw).
+  Replace('${AZURE_CLIENT_ID}', $env:AZURE_CLIENT_ID).
+  Replace('${AZURE_AI_FOUNDRY_ENDPOINT}', $env:AZURE_AI_FOUNDRY_ENDPOINT).
+  Replace('${AZURE_AI_FOUNDRY_DEPLOYMENT}', $env:AZURE_AI_FOUNDRY_DEPLOYMENT).
+  Replace('${AGENTIC_OPS_IMAGE}', $env:AGENTIC_OPS_IMAGE) |
+  Set-Content .\deploy\aks-agentic-ops.rendered.yaml
+
+kubectl apply -f .\deploy\aks-agentic-ops.rendered.yaml
+kubectl rollout status deployment/agentic-ops -n agentic-ops
+kubectl get pods -n agentic-ops
+```
+
+Verify the service health from inside the cluster:
+
+```powershell
+kubectl run agentic-ops-healthcheck `
+  --rm -i --restart=Never `
+  --image=curlimages/curl `
+  -- curl --fail http://agentic-ops.agentic-ops.svc.cluster.local:8080/healthz
 ```
 
 The webhook accepts `POST /api/v1/incidents` with:
