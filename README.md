@@ -1,5 +1,7 @@
 # Azure Kubernetes Agentic Ops
 
+> **Test workload:** `test-app` is a disposable nginx placeholder used only for fault injection and recovery checks. It has no business logic, payment processing, business data or extra backend. `tset-app` is the deliberately misspelled image alias used in the recovery scenario.
+
 This repository contains the first implementation slice described in
 [project-concept.md](./project-concept.md): a safety-first incident
 orchestrator with source-backed facts, deduplication, rate limiting, and a
@@ -106,9 +108,9 @@ The webhook accepts `POST /api/v1/incidents` with:
 
 ```json
 {
-  "namespace": "payments",
-  "pod": "payments-api-abc",
-  "workload": "payments-api",
+  "namespace": "test-app",
+  "pod": "test-app-abc",
+  "workload": "test-app",
   "reason": "CrashLoopBackOff",
   "correlation_id": "INC-4821"
 }

@@ -31,7 +31,7 @@ class Executor:
 
 
 def trigger():
-    return IncidentTrigger("payments", "api-1", "api", "CrashLoopBackOff", "corr-1")
+    return IncidentTrigger("test-app", "api-1", "api", "CrashLoopBackOff", "corr-1")
 
 
 def facts(action=None, groundedness=0.95):
@@ -47,7 +47,7 @@ def test_safe_action_is_executed_and_incident_resolved():
     assert result.incident.status is IncidentStatus.RESOLVED
     assert result.action_executed
     assert executor.actions[0].name == "rollout_restart"
-    assert executor.actions[0].parameters["namespace"] == "payments"
+    assert executor.actions[0].parameters["namespace"] == "test-app"
 
 
 def test_non_whitelisted_action_is_rejected():
