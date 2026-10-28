@@ -1,0 +1,1 @@
+id,scanner,advisory_or_rule,component,version,location,severity,cvss,epss,kev,reachability,exposure,priority,owner,status,first_seen,target_date,decision,approver,acceptance_expiry,before_run,fix_commit,after_run

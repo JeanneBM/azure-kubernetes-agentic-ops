@@ -140,3 +140,11 @@ other resources in that group:
 The destructive mode asks you to type the resource group name and starts
 deletion asynchronously. Use `-WhatIf` to inspect the action without changing
 Azure resources.
+
+## CI security controls
+
+[Security scanning and triage](docs/security/README.md) covers Python SAST,
+resolved dependencies, secrets, container and Kubernetes/Docker configuration,
+plus a CycloneDX SBOM. GitHub Actions builds and scans locally without Azure
+credentials or deployments. Merge blocking additionally requires the documented
+repository rule for the **Security gate** check.
