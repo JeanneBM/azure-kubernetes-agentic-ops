@@ -63,10 +63,31 @@ spec:
         app: agentic-ops
         azure.workload.identity/use: "true"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: agentic-ops
       containers:
         - name: orchestrator
           image: "${AGENTIC_OPS_IMAGE}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           ports:
             - containerPort: 8080
           env:
@@ -82,3 +103,7 @@ spec:
             httpGet:
               path: /healthz
               port: 8080
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
