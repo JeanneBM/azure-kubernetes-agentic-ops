@@ -62,7 +62,8 @@ available. Dependency update PRs still require review and passing checks.
 
 Statuses: open, in-progress, fixed, contained, risk-accepted, false-positive.
 Do not put secrets, customer data or exploit payloads in public tracking files.
-There are no fabricated findings in the initial register.
+The register contains real findings from the first CI run; they are not yet
+accepted or verified fixed. Multiple affected packages can share a CVE.
 
 ## Demonstration and weekly reporting
 
