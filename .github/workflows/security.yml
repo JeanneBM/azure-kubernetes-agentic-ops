@@ -71,6 +71,24 @@ jobs:
       - name: Build local image (no push or deployment)
         if: ${{ !cancelled() }}
         run: docker build --pull -t agentic-ops:security .
+      - name: Verify runtime imports and HTTP health without Azure
+        if: ${{ !cancelled() }}
+        run: |
+          docker run --rm -i agentic-ops:security python - <<'PY'
+          import os
+          import azure.identity, kubernetes, uvicorn
+          from unittest.mock import patch
+          from fastapi.testclient import TestClient
+          os.environ["AZURE_AI_FOUNDRY_ENDPOINT"] = "https://example.invalid"
+          os.environ["AZURE_AI_FOUNDRY_DEPLOYMENT"] = "offline-smoke"
+          with patch("agentic_ops.aks.AksDiagnosticProvider"), patch("agentic_ops.aks.AksActionExecutor"), patch("agentic_ops.foundry.FoundryDiagnosticProvider"):
+              from agentic_ops.web import app
+              with TestClient(app) as client:
+                  response = client.get("/healthz")
+                  assert response.status_code == 200
+                  assert response.json() == {"status": "ok"}
+          print("Runtime imports and HTTP health passed as non-root")
+          PY
       - name: Scan container (including vulnerabilities without a fix)
         if: ${{ !cancelled() }}
         run: trivy image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --format json --output reports/container.json agentic-ops:security
