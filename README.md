@@ -1,5 +1,7 @@
 # Azure Kubernetes Agentic Ops
 
+[![Test](https://img.shields.io/github/actions/workflow/status/JeanneBM/azure-kubernetes-agentic-ops/security.yml?branch=main&label=Test&logo=github)](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml)
+
 [![Security](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml)
 
 > **Test workload:** `test-app` is a disposable nginx placeholder used only for fault injection and recovery checks. It has no business logic, payment processing, business data or extra backend. `tset-app` is the deliberately misspelled image alias used in the recovery scenario.
