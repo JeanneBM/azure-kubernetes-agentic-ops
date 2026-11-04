@@ -1,4 +1,4 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.15-alpine AS builder
 
 RUN apk upgrade --no-cache
 WORKDIR /build
@@ -6,7 +6,7 @@ COPY pyproject.toml README.md ./
 COPY src ./src
 RUN pip install --no-cache-dir --prefix=/install .
 
-FROM python:3.11-alpine AS runtime
+FROM python:3.15-alpine AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 # Build tooling and its vendored dependencies are not needed at runtime.
