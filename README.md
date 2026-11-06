@@ -4,6 +4,17 @@
 
 [![Security](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml)
 
+## Project series
+
+**Start here:** final results are in [Eval](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-eval); new work happens in [Lab](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-lab).
+
+| Stage | Repository | Role | Status |
+| --- | --- | --- | --- |
+| 1 | **azure-kubernetes-agentic-ops** (this repository) | First implementation slice: infrastructure-agnostic incident orchestrator core | Historical, not developed further |
+| 2 | [azure-kubernetes-agentic-ops-poc](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-poc) | Two-agent AKS prototype with demo recording | Superseded by Eval |
+| 3 | [azure-kubernetes-agentic-ops-eval](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-eval) | Live evaluation against a deterministic baseline; **final results** | Closed on 29 October 2026 (v0.2.0) |
+| 4 | [azure-kubernetes-agentic-ops-lab](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-lab) | Automated experiments, adversarial scenarios and decision replay | Active development |
+
 > **Test workload:** `test-app` is a disposable nginx placeholder used only for fault injection and recovery checks. It has no business logic, payment processing, business data or extra backend. `tset-app` is the deliberately misspelled image alias used in the recovery scenario.
 
 This repository contains the first implementation slice described in
