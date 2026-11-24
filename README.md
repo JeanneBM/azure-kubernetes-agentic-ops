@@ -4,6 +4,31 @@
 
 [![Security](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/JeanneBM/azure-kubernetes-agentic-ops/actions/workflows/security.yml)
 
+## Architecture
+
+Historical first implementation. The AKS adapters connect the infrastructure-agnostic core to Kubernetes and Foundry; this version does not implement the later two-agent image-repair workflow.
+
+```mermaid
+flowchart TD
+  EVENT["Incident webhook"] --> API["FastAPI incident endpoint"]
+  subgraph CORE["Incident orchestrator"]
+    API --> DEDUP["Deduplication and cooldown"]
+    DEDUP --> FACTS["Source-backed facts and groundedness check"]
+    FACTS --> GATE{"Self-cure whitelist"}
+    GATE -->|"allowed"| EXEC["Bound action executor"]
+    FACTS -->|"insufficient evidence or no safe action"| HUMAN["Escalated incident and recommendation"]
+    GATE -->|"outside whitelist"| BLOCK["Permission error"]
+  end
+  subgraph ADAPTERS["AKS deployment adapters"]
+    K8S[("Kubernetes API: pods, events, logs")]
+    MODEL["Foundry model: structured facts"]
+  end
+  K8S --> FACTS
+  K8S --> MODEL
+  MODEL --> FACTS
+  EXEC -->|"restart, scale or evict"| K8S
+```
+
 ## Project series
 
 **Start here:** final results are in [Eval](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-eval); new work happens in [Lab](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-lab).
